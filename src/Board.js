@@ -45,7 +45,15 @@ function Board({ nrows=5, ncols=5, chanceLightStartsOn=0.2 }) {
   };
 
   function hasWon() {
-    // TODO: check the board in state to determine whether the player has won.
+    const cellsOn = board.map(
+      row => {
+        const rowTruths = row.filter(
+        on => on)
+        return rowTruths.length;
+      }
+    );
+    const countOn = cellsOn.reduce((acc, val) => acc + val);
+    return (countOn === 0);
   }
 
   function flipCellsAround(coord) {
@@ -61,11 +69,17 @@ function Board({ nrows=5, ncols=5, chanceLightStartsOn=0.2 }) {
       };
 
       // TODO: Make a (deep) copy of the oldBoard
+      const boardCopy = board.map(row => row.map(cel => cel));
 
       // TODO: in the copy, flip this cell and the cells around it
+      flipCell(y, x, boardCopy);
+      flipCell(y-1, x, boardCopy);
+      flipCell(y-1, x-1, boardCopy);
+      flipCell(y+1, x, boardCopy);
+      flipCell(y+1, x+1, boardCopy);
 
       // TODO: return the copy
-      
+      return setBoard(boardCopy);      
     });
   }
 
@@ -77,24 +91,41 @@ function Board({ nrows=5, ncols=5, chanceLightStartsOn=0.2 }) {
 
   // TODO
   return (
-    <table data-testid="Board-table">
-      <thead>
-        <th colspan={ncols}>𝅘𝅥𝅮  &nbsp;<sup>𝅘𝅥𝅮 </sup><sub>𝅘𝅥𝅮 </sub>&nbsp;I see a red square and I want to paint it bla-ack. 𝅘𝅥𝅮  &nbsp;<sup>𝅘𝅥𝅮 </sup><sub>𝅘𝅥𝅮 </sub></th>
-      </thead>
-      {
-        board.map((rowOfCels, ridx) =>  (
-            <tr>
-              {rowOfCels.map((cel, cidx) => (
-                <Cell 
-                  flipCellsAroundMe={flipCellsAround}
-                  isLit={cel}
-                  key={`${ridx}-${cidx}`}
-                  />
-              ))}
-            </tr>
-          ))
-      }
-    </table>
+    hasWon() ? (
+      <div className="Board-won">
+        <h1>YOU WIN! Congratulations.</h1>
+        <button 
+          onClick={setBoard(createBoard())}
+          className="Board-restart"
+        >
+          play again
+        </button>
+      </div>
+    ) : (
+      <table data-testid="Board-table">
+        <thead>
+          <tr>
+            <th colSpan={ncols}>𝅘𝅥𝅮  &nbsp;<sup>𝅘𝅥𝅮 </sup><sub>𝅘𝅥𝅮 </sub>&nbsp;I see a red square and I want to paint it bla-ack. 𝅘𝅥𝅮  &nbsp;<sup>𝅘𝅥𝅮 </sup><sub>𝅘𝅥𝅮 </sub></th>
+          </tr>
+        </thead>
+        <tbody>
+        {
+          board.map((rowOfCels, ridx) =>  (
+              <tr key={`${ridx}`}>
+                {rowOfCels.map((cel, cidx) => (
+                  <Cell 
+                    flipCellsAroundMe={flipCellsAround}
+                    isLit={cel}
+                    coord={`${ridx}-${cidx}`}
+                    key={`${ridx}-${cidx}`}
+                    />
+                ))}
+              </tr>
+            ))
+        }
+        </tbody>
+      </table>
+    )
   );
 };
 
