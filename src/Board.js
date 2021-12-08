@@ -45,15 +45,16 @@ function Board({ nrows=5, ncols=5, chanceLightStartsOn=0.2 }) {
   };
 
   function hasWon() {
-    const cellsOn = board.map(
+    const cellsOff = board.map(
       row => {
-        const rowTruths = row.filter(
-        on => on)
-        return rowTruths.length;
+        const rowFalses = row.filter(
+        on => !on)
+        return rowFalses.length;
       }
     );
-    const countOn = cellsOn.reduce((acc, val) => acc + val);
-    return (countOn === 0);
+    const countOff = cellsOff.reduce((acc, val) => acc + val);
+    console.log(countOff)
+    return (countOff === 0);
   }
 
   function flipCellsAround(coord) {
@@ -73,13 +74,17 @@ function Board({ nrows=5, ncols=5, chanceLightStartsOn=0.2 }) {
 
       // TODO: in the copy, flip this cell and the cells around it
       flipCell(y, x, boardCopy);
+      flipCell(y, x-1, boardCopy);
+      flipCell(y, x+1, boardCopy);
       flipCell(y-1, x, boardCopy);
       flipCell(y-1, x-1, boardCopy);
+      flipCell(y-1, x+1, boardCopy);
       flipCell(y+1, x, boardCopy);
+      flipCell(y+1, x-1, boardCopy);
       flipCell(y+1, x+1, boardCopy);
 
       // TODO: return the copy
-      return setBoard(boardCopy);      
+      return boardCopy;
     });
   }
 
@@ -94,12 +99,6 @@ function Board({ nrows=5, ncols=5, chanceLightStartsOn=0.2 }) {
     hasWon() ? (
       <div className="Board-won">
         <h1>YOU WIN! Congratulations.</h1>
-        <button 
-          onClick={setBoard(createBoard())}
-          className="Board-restart"
-        >
-          play again
-        </button>
       </div>
     ) : (
       <table data-testid="Board-table">
